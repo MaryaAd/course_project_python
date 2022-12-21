@@ -2,7 +2,8 @@ import requests
 import json
 from datetime import datetime
 from settings import TOKEN_Y, TOKEN_VK
-
+import time
+from tqdm import tqdm
 
 def largest_size(sizes):
     sizes_list = ['w', 'z', 'y', 'x', 'm', 's']
@@ -82,13 +83,13 @@ class Yandex:
         create_file_names(photos)
         if self.create_folder(folder_name):
             result = []
-            for photo in photos:
+            for photo in tqdm(photos):
                 response = requests.post("https://cloud-api.yandex.net/v1/disk/resources/upload",
                                          params={"path": '/' + folder_name + '/' + photo.name,
                                                  "url": photo.url},
                                          headers={"Authorization": self.token})
+                time.sleep(1)
                 if response.status_code == 202:
-                    print(f'Фото "{photo.name}" загружено.')
                     result.append({"file_name": photo.name, "size": photo.size_type})
                 else:
                     print(f'Ошибка загрузки "{photo.name}": '
